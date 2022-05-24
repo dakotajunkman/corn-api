@@ -8,6 +8,8 @@ app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+app.use("/auth", require("./controllers/auth.js"));
+
 app.get("/", (req, res) => {
     res.render("welcome");
 })
