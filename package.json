@@ -22,6 +22,7 @@
   "homepage": "https://github.com/dakotajunkman/corn-api#readme",
   "dependencies": {
     "@google-cloud/datastore": "^6.6.2",
+    "axios": "^0.27.2",
     "body-parser": "^1.20.0",
     "ejs": "^3.1.8",
     "express": "^4.18.1",
