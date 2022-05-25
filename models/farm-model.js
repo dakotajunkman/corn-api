@@ -58,7 +58,11 @@ async function getFarmById(req) {
 }
 
 async function getFarmsForOwner(req) {
-    const countQuery = ds.createQuery(constants.FARM).filter("owner", "=", req.auth.sub);
+    // gets all entities of this owner
+    // only getting the key since we just need the total count
+    const countQuery = ds.createQuery(constants.FARM)
+        .select("__key__")
+        .filter("owner", "=", req.auth.sub);
 
     let query = ds.createQuery(constants.FARM)
         .filter("owner", "=", req.auth.sub)
