@@ -21,6 +21,7 @@ const checkJwt = jwt({
 const router = express.Router();
 router.use(bodyParser.json());
 
+// create a farm
 router.post("/", checkJwt, async (req, res) => {
     if (!constants.isJson(req)) {
         res.status(415).json(constants.jsonAccErr);
@@ -39,6 +40,20 @@ router.post("/", checkJwt, async (req, res) => {
     }
 
     res.status(201).json(created);
+});
+
+
+// garbage we will not tolerate
+router.delete("/", (req, res) => {
+    res.status(405).set("Accept", "POST, GET").end();
+});
+
+router.put("/", (req, res) => {
+    res.status(405).set("Accept", "POST, GET").end();
+});
+
+router.patch("/", (req, res) => {
+    res.status(405).set("Accept", "POST, GET").end();
 });
 
 // catch JWT errors (invalid or missing)
