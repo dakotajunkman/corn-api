@@ -11,10 +11,15 @@ const SIZE = "size";
 const STATE = "state";
 const FARM = "Farm";
 
+/* NUMBER CONSTANTS */
+const PAGESIZE = 5;
+
 /* CONSTANT JSON RESPONSES */
 const jsonResErr = {"Error": "This endpoint only supports JSON responses."};
 const jsonAccErr = {"Error": "This endpoint only accepts JSON bodies."};
-const bodyErr = {"Error": "JSON body has invalid or missing attributes"};
+const bodyErr = {"Error": "JSON body has invalid or missing attributes."};
+const doesntExit = {"Error": "The requested item does not exist."};
+const noAccess = {"Error": "The requested item cannot be accessed by this user."};
 
 /* CONSTANT COLLECTIONS */
 const states = new Set(["AL", "AK", "AZ", "AR", "AS", "CA", "CO", "CT", "DE", "DC", "FL", 
@@ -36,6 +41,10 @@ function generateSelfFromReq(req, id) {
     return `${req.protocol}://${req.get("host")}${req.baseUrl}/${id}`;
 }
 
+function generateNext(req, cursor) {
+    return `${req.protocol}://${req.get("host")}${req.baseUrl}?cursor=${cursor}`;
+}
+
 module.exports = {
     clientId,
     clientSecret,
@@ -53,5 +62,9 @@ module.exports = {
     SIZE,
     FARM,
     generateSelfFromReq,
-    bodyErr
+    bodyErr,
+    doesntExit,
+    noAccess,
+    PAGESIZE,
+    generateNext
 }

@@ -42,6 +42,37 @@ router.post("/", checkJwt, async (req, res) => {
     res.status(201).json(created);
 });
 
+router.get("/:farmId", checkJwt, async (req, res) => {
+    if (!constants.acceptJson(req)) {
+        res.status(406).json(constants.jsonResErr);
+        return;
+    }
+
+    const farm = await farms.getFarmById(req);
+
+    switch (farm) {
+        case undefined:
+            res.status(404).json(constants.doesntExit);
+            break;
+        case false:
+            res.status(403).json(constants.noAccess);
+            break;
+        default:
+            res.status(200).json(farm);
+            break;
+    }
+});
+
+router.get("/", checkJwt, async (req, res) => {
+    if (!constants.acceptJson(req)) {
+        res.status(406).json(constants.jsonResErr);
+        return;
+    }
+
+    const results = await farms.getFarmsForOwner(req);
+    res.status(200).json(results);
+});
+
 
 // garbage we will not tolerate
 router.delete("/", (req, res) => {

@@ -29,15 +29,70 @@ async function createFarm(req) {
     }
 
     body.owner = req.auth.sub;
+    body.cornFields = [];
 
     const key = ds.key([constants.FARM]);
     await ds.save({key: key, data: body});
     body.id = key.id;
     body.self = constants.generateSelfFromReq(req, body.id);
 
+
     return body;
 }
 
+async function getFarmById(req) {
+    const key = ds.key([constants.FARM, parseInt(req.params.farmId, 10)]);
+    const farmObj = await ds.get(key);
+
+    if (!itemExists(farmObj)) {
+        return;
+    }
+
+    const farm = farmObj[0];
+    if (farm.owner !== req.auth.sub) {
+        return false;
+    }
+
+    farm.self = constants.generateSelfFromReq(req, req.params.farmId);
+    return datastore.fromDatastore(farm);
+}
+
+async function getFarmsForOwner(req) {
+    const countQuery = ds.createQuery(constants.FARM).filter("owner", "=", req.auth.sub);
+    const res = await ds.runQuery(countQuery);
+    const count = res[0].length;
+
+    let query = ds.createQuery(constants.FARM)
+        .filter("owner", "=", req.auth.sub)
+        .limit(constants.PAGESIZE);
+
+    const cursor = req.query.cursor;
+    if (cursor !== undefined) {
+        query = query.start(cursor);
+    }
+
+    const farms = await ds.runQuery(query);
+
+    const retObj = {
+        farms: farms[0].map(farm => {
+            farm = datastore.fromDatastore(farm);
+            farm.self = constants.generateSelfFromReq(req, farm.id);
+            return farm;
+        })
+    };
+
+    retObj.count = count;
+    const info = farms[1];
+    
+    if (info.moreResults !== ds.NO_MORE_RESULTS) {
+        retObj.next = constants.generateNext(req, info.endCursor);
+    }
+
+    return retObj;
+}
+
 module.exports = {
-    createFarm
+    createFarm,
+    getFarmById,
+    getFarmsForOwner
 }
