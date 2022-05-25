@@ -59,8 +59,6 @@ async function getFarmById(req) {
 
 async function getFarmsForOwner(req) {
     const countQuery = ds.createQuery(constants.FARM).filter("owner", "=", req.auth.sub);
-    const res = await ds.runQuery(countQuery);
-    const count = res[0].length;
 
     let query = ds.createQuery(constants.FARM)
         .filter("owner", "=", req.auth.sub)
@@ -71,7 +69,7 @@ async function getFarmsForOwner(req) {
         query = query.start(cursor);
     }
 
-    const farms = await ds.runQuery(query);
+    const [totalResults, farms] = await Promise.all([ds.runQuery(countQuery), ds.runQuery(query)]);
 
     const retObj = {
         farms: farms[0].map(farm => {
@@ -81,7 +79,7 @@ async function getFarmsForOwner(req) {
         })
     };
 
-    retObj.count = count;
+    retObj.count = totalResults[0].length;
     const info = farms[1];
     
     if (info.moreResults !== ds.NO_MORE_RESULTS) {
