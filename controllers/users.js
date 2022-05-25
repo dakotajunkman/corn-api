@@ -14,4 +14,14 @@ router.post("/", async (req, res) => {
     res.status(201).json({user: createdUser});
 });
 
+router.get("/", async (req, res) => {
+    const userArr = await user.getAllUsers();
+    const returnJson = {
+        count: userArr.length,
+        users: userArr
+    };
+
+    res.status(200).json(returnJson);
+});
+
 module.exports = router;

@@ -19,6 +19,13 @@ async function createUser(jwt) {
     return user;
 }
 
+async function getAllUsers() {
+    const query = ds.createQuery(constants.USER);
+    const users = await ds.runQuery(query);
+    return users[0].map(datastore.fromDatastore);
+}
+
 module.exports = {
-    createUser
+    createUser,
+    getAllUsers
 }
