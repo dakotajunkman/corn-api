@@ -12,6 +12,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use("/auth", require("./controllers/auth.js"));
 app.use("/users", require("./controllers/users"));
 app.use("/farms", require("./controllers/farms"));
+app.use("/cornfields", require("./controllers/corn"));
 
 app.get("/", (req, res) => {
     res.render("welcome");

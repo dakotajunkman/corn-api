@@ -10,6 +10,7 @@ const NAME = "name";
 const SIZE = "size";
 const STATE = "state";
 const FARM = "Farm";
+const CORN = "CornField";
 
 /* NUMBER CONSTANTS */
 const PAGESIZE = 5;
@@ -27,6 +28,8 @@ const states = new Set(["AL", "AK", "AZ", "AR", "AS", "CA", "CO", "CT", "DE", "D
     "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "CM", "OH", "OK", "OR",
     "PA", "PR", "RI", "SC", "SD", "TN", "TX", "TT", "UT", "VT", "VA", "VI", "WA", "WV", "WI",
     "WY"]);
+
+const cornTypes = new Set(["flint", "dent", "sweet", "pop"]);
 
 /* CONSTANT/SHARED FUNCTIONS */
 function acceptJson(req) {
@@ -66,5 +69,7 @@ module.exports = {
     doesntExit,
     noAccess,
     PAGESIZE,
-    generateNext
+    generateNext,
+    cornTypes,
+    CORN
 }

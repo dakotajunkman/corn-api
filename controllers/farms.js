@@ -42,6 +42,7 @@ router.post("/", checkJwt, async (req, res) => {
     res.status(201).json(created);
 });
 
+// get farm by ID
 router.get("/:farmId", checkJwt, async (req, res) => {
     if (!constants.acceptJson(req)) {
         res.status(406).json(constants.jsonResErr);
@@ -63,6 +64,7 @@ router.get("/:farmId", checkJwt, async (req, res) => {
     }
 });
 
+// get all farms for a user
 router.get("/", checkJwt, async (req, res) => {
     if (!constants.acceptJson(req)) {
         res.status(406).json(constants.jsonResErr);
