@@ -45,6 +45,18 @@ router.get("/:cornId", async (req, res) => {
     res.status(200).json(cornField);
 });
 
+// get all the corn (everyone's dream)
+router.get("/", async (req, res) => {
+    if (!constants.acceptJson(req)) {
+        res.status(406).json(constants.bodyErr);
+        return;
+    }
+
+    const allCorn = await corn.getAllCorn(req);
+
+    res.status(200).json(allCorn);
+});
+
 // nobody will be allowed to delete all the corn
 router.delete("/", (req, res) => {
     res.status(405).set("Accept", "POST, GET").end();

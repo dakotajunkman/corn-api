@@ -51,7 +51,39 @@ async function getCornById(req) {
     return retCorn;
 }
 
+async function getAllCorn(req) {
+    // keys only query since we just need total count
+    const countQuery = ds.createQuery(constants.CORN).select("__key__");
+
+    const cursor = req.query.cursor;
+
+    let query = ds.createQuery(constants.CORN).limit(constants.PAGESIZE);
+    if (cursor !== undefined) {
+        query = query.start(cursor);
+    }
+
+    const [totalCorn, queryCorn] = await Promise.all([ds.runQuery(countQuery), ds.runQuery(query)]);
+
+    const retCorn = {
+        cornFields: queryCorn[0].map(corn => {
+            corn = datastore.fromDatastore(corn);
+            corn.self = constants.generateSelfFromReq(req, corn.id);
+            return corn;
+        })
+    };
+
+    retCorn.count = totalCorn[0].length;
+
+    const info = queryCorn[1];
+    if (info.moreResults !== ds.NO_MORE_RESULTS) {
+        retCorn.next = constants.generateNext(req, info.endCursor);
+    }
+
+    return retCorn;
+}
+
 module.exports = {
     createCorn,
-    getCornById
+    getCornById,
+    getAllCorn
 }
