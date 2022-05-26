@@ -45,4 +45,17 @@ router.get("/:cornId", async (req, res) => {
     res.status(200).json(cornField);
 });
 
+// nobody will be allowed to delete all the corn
+router.delete("/", (req, res) => {
+    res.status(405).set("Accept", "POST, GET").end();
+});
+
+router.put("/", (req, res) => {
+    res.status(405).set("Accept", "POST, GET").end();
+});
+
+router.patch("/", (req, res) => {
+    res.status(405).set("Accept", "POST, GET").end();
+});
+
 module.exports = router;
