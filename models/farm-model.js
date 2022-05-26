@@ -4,10 +4,6 @@ const constants = require("../common/constants");
 const datastore = require("../common/datastore");
 const ds = datastore.datastore;
 
-function itemExists(item) {
-    return item[0] !== undefined && item[0] !== null;
-}
-
 function validBody(farmObj) {
     const keys = Object.keys(farmObj);
     const validKeys = keys.length === 3 &&
@@ -44,7 +40,7 @@ async function getFarmById(req) {
     const key = ds.key([constants.FARM, parseInt(req.params.farmId, 10)]);
     const farmObj = await ds.get(key);
 
-    if (!itemExists(farmObj)) {
+    if (!constants.itemExists(farmObj)) {
         return;
     }
 

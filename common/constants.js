@@ -48,6 +48,10 @@ function generateNext(req, cursor) {
     return `${req.protocol}://${req.get("host")}${req.baseUrl}?cursor=${cursor}`;
 }
 
+function itemExists(item) {
+    return item[0] !== undefined && item[0] !== null;
+}
+
 module.exports = {
     clientId,
     clientSecret,
@@ -71,5 +75,6 @@ module.exports = {
     PAGESIZE,
     generateNext,
     cornTypes,
-    CORN
+    CORN,
+    itemExists
 }

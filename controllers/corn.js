@@ -29,4 +29,20 @@ router.post("/", async (req, res) => {
     res.status(201).json(createdCorn);
 });
 
+// get some corn
+router.get("/:cornId", async (req, res) => {
+    if (!constants.acceptJson(req)) {
+        res.status(406).json(constants.bodyErr);
+        return;
+    }
+
+    const cornField = await corn.getCornById(req);
+    if(cornField === undefined) {
+        res.status(404).json(constants.doesntExit);
+        return;
+    }
+
+    res.status(200).json(cornField);
+});
+
 module.exports = router;

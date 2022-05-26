@@ -1,6 +1,5 @@
 "use strict";
 
-const { DownscopedClient } = require("google-auth-library");
 const constants = require("../common/constants");
 const datastore = require("../common/datastore");
 const ds = datastore.datastore;
@@ -37,6 +36,22 @@ async function createCorn(req) {
     return cornObj;
 }
 
+async function getCornById(req) {
+    const key = ds.key([constants.CORN, parseInt(req.params.cornId, 10)]);
+
+    const corn = await ds.get(key);
+
+    if (!constants.itemExists(corn)) {
+        return;
+    }
+
+    const retCorn = datastore.fromDatastore(corn[0]);
+    retCorn.self = constants.generateSelfFromReq(req, retCorn.id);
+
+    return retCorn;
+}
+
 module.exports = {
-    createCorn
+    createCorn,
+    getCornById
 }
