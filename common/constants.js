@@ -54,6 +54,20 @@ function itemExists(item) {
     return item[0] !== undefined && item[0] !== null;
 }
 
+function generateCornObjFromId(cornId, req) {
+    return {
+        id: cornId,
+        self: `${req.protocol}://${req.get("host")}/cornfields/${cornId}`
+    };
+}
+
+function generateFarmObjFromId(farmId, req) {
+    return {
+        id: farmId,
+        self: `${req.protocol}://${req.get("host")}/farms/${farmId}`
+    };
+}
+
 module.exports = {
     clientId,
     clientSecret,
@@ -80,5 +94,7 @@ module.exports = {
     CORN,
     itemExists,
     itemsNoExist,
-    unAuthed
+    unAuthed,
+    generateCornObjFromId,
+    generateFarmObjFromId
 }

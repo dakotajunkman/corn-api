@@ -65,6 +65,11 @@ async function getFarmById(req) {
     }
 
     farm.self = constants.generateSelfFromReq(req, req.params.farmId);
+
+    if (farm.cornFields.length > 0) {
+        farm.cornFields = farm.cornFields.map(cornId => constants.generateCornObjFromId(cornId, req));
+    }
+
     return datastore.fromDatastore(farm);
 }
 
@@ -90,6 +95,7 @@ async function getFarmsForOwner(req) {
         farms: farms[0].map(farm => {
             farm = datastore.fromDatastore(farm);
             farm.self = constants.generateSelfFromReq(req, farm.id);
+            farm.cornFields = farm.cornFields.map(cornId => constants.generateCornObjFromId(cornId, req));
             return farm;
         })
     };

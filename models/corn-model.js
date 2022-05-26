@@ -48,6 +48,10 @@ async function getCornById(req) {
     const retCorn = datastore.fromDatastore(corn[0]);
     retCorn.self = constants.generateSelfFromReq(req, retCorn.id);
 
+    if (retCorn.farm !== null) {
+        retCorn.farm = constants.generateFarmObjFromId(retCorn.farm, req);
+    }
+
     return retCorn;
 }
 
@@ -68,6 +72,9 @@ async function getAllCorn(req) {
         cornFields: queryCorn[0].map(corn => {
             corn = datastore.fromDatastore(corn);
             corn.self = constants.generateSelfFromReq(req, corn.id);
+            if (corn.farm !== null) {
+                corn.farm = constants.generateFarmObjFromId(corn.farm, req);
+            }
             return corn;
         })
     };
