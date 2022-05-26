@@ -18,6 +18,21 @@ function validBody(farmObj) {
     return validKeys && validName && validSize && validState;
 }
 
+async function getFarmAndCorn(farmId, cornId) {
+    const farmKey = ds.key([constants.FARM, parseInt(farmId, 10)]);
+    const cornKey = ds.key([constants.CORN, parseInt(cornId, 10)]);
+
+    const res = await Promise.all([ds.get(farmKey), ds.get(cornKey)]);
+
+    return res;
+}
+
+async function updateFarmAndCorn(farm, farmId, corn, cornId) {
+    const farmKey = ds.key([constants.FARM, parseInt(farmId, 10)]);
+    const cornKey = ds.key([constants.CORN, parseInt(cornId, 10)]);
+    await Promise.all([ds.update({key: farmKey, data: farm}), ds.update({key: cornKey, data: corn})]);
+}
+
 async function createFarm(req) {
     const body = req.body;
     if(!validBody(body)) {
@@ -89,8 +104,32 @@ async function getFarmsForOwner(req) {
     return retObj;
 }
 
+async function assignCorn(req) {
+    const farmId = req.params.farmId;
+    const cornId = req.params.cornId;
+    const [farmRes, cornRes] = await getFarmAndCorn(farmId, cornId);
+    if (!constants.itemExists(farmRes) || !constants.itemExists(cornRes)) {
+        return;
+    }
+
+    const farm = farmRes[0];
+    const corn = cornRes[0];
+
+    // User not authorized to edit this farm
+    if (farm.owner !== req.auth.sub || corn.farm !== null) {
+        return false;
+    }
+
+    farm.cornFields.push(cornId);
+    corn.farm = farmId;
+
+    return updateFarmAndCorn(farm, farmId, corn, cornId)
+        .then(() => true);
+}
+
 module.exports = {
     createFarm,
     getFarmById,
-    getFarmsForOwner
+    getFarmsForOwner,
+    assignCorn
 }

@@ -75,6 +75,27 @@ router.get("/", checkJwt, async (req, res) => {
     res.status(200).json(results);
 });
 
+// assign some corn to a farm
+router.put("/:farmId/cornfields/:cornId", checkJwt, async (req, res) => {
+    if (!constants.acceptJson(req)) {
+        res.status(406).json(constants.bodyErr);
+        return;
+    }
+
+    const success = await farms.assignCorn(req);
+    switch (success) {
+        case undefined:
+            res.status(404).json(constants.itemsNoExist);
+            break;
+        case false:
+            res.status(403).json(constants.unAuthed);
+            break;
+        default:
+            res.status(204).end();
+            break;
+    }
+});
+
 
 // garbage we will not tolerate
 router.delete("/", (req, res) => {

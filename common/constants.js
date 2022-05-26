@@ -21,6 +21,8 @@ const jsonAccErr = {"Error": "This endpoint only accepts JSON bodies."};
 const bodyErr = {"Error": "JSON body has invalid or missing attributes."};
 const doesntExit = {"Error": "The requested item does not exist."};
 const noAccess = {"Error": "The requested item cannot be accessed by this user."};
+const itemsNoExist = {"Error": "One of the specified items does not exist"};
+const unAuthed = {"Error": "User not authorized to perform this action."};
 
 /* CONSTANT COLLECTIONS */
 const states = new Set(["AL", "AK", "AZ", "AR", "AS", "CA", "CO", "CT", "DE", "DC", "FL", 
@@ -76,5 +78,7 @@ module.exports = {
     generateNext,
     cornTypes,
     CORN,
-    itemExists
+    itemExists,
+    itemsNoExist,
+    unAuthed
 }
