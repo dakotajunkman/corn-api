@@ -32,7 +32,7 @@ router.post("/", async (req, res) => {
 // get some corn
 router.get("/:cornId", async (req, res) => {
     if (!constants.acceptJson(req)) {
-        res.status(406).json(constants.bodyErr);
+        res.status(406).json(constants.jsonResErr);
         return;
     }
 
@@ -48,7 +48,7 @@ router.get("/:cornId", async (req, res) => {
 // get all the corn (everyone's dream)
 router.get("/", async (req, res) => {
     if (!constants.acceptJson(req)) {
-        res.status(406).json(constants.bodyErr);
+        res.status(406).json(constants.jsonResErr);
         return;
     }
 

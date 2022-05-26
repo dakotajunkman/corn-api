@@ -77,11 +77,6 @@ router.get("/", checkJwt, async (req, res) => {
 
 // assign some corn to a farm
 router.put("/:farmId/cornfields/:cornId", checkJwt, async (req, res) => {
-    if (!constants.acceptJson(req)) {
-        res.status(406).json(constants.bodyErr);
-        return;
-    }
-
     const success = await farms.assignCorn(req);
     switch (success) {
         case undefined:
@@ -96,6 +91,10 @@ router.put("/:farmId/cornfields/:cornId", checkJwt, async (req, res) => {
     }
 });
 
+// remove corn from a farm
+router.delete("/:farmId/cornfields/:cornId", checkJwt, async (req, res) => {
+
+});
 
 // garbage we will not tolerate
 router.delete("/", (req, res) => {
