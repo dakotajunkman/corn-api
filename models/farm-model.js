@@ -133,9 +133,33 @@ async function assignCorn(req) {
         .then(() => true);
 }
 
+async function removeCorn(req) {
+    const farmId = req.params.farmId;
+    const cornId = req.params.cornId;
+    const [farmRes, cornRes] = await getFarmAndCorn(farmId, cornId);
+    if (!constants.itemExists(farmRes) || !constants.itemExists(cornRes)) {
+        return;
+    }
+
+    const farm = farmRes[0];
+    const corn = cornRes[0];
+
+    // User not authorized to edit this farm
+    if (farm.owner !== req.auth.sub || corn.farm !== farmId) {
+        return false;
+    }
+
+    corn.farm = null;
+    farm.cornFields = farm.cornFields.filter(id => id !== cornId);
+
+    return updateFarmAndCorn(farm, farmId, corn, cornId)
+        .then(() => true);
+}
+
 module.exports = {
     createFarm,
     getFarmById,
     getFarmsForOwner,
-    assignCorn
+    assignCorn,
+    removeCorn
 }

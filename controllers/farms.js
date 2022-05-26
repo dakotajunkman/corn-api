@@ -93,7 +93,18 @@ router.put("/:farmId/cornfields/:cornId", checkJwt, async (req, res) => {
 
 // remove corn from a farm
 router.delete("/:farmId/cornfields/:cornId", checkJwt, async (req, res) => {
-
+    const success = await farms.removeCorn(req);
+    switch (success) {
+        case undefined:
+            res.status(404).json(constants.itemsNoExist);
+            break;
+        case false:
+            res.status(403).json(constants.unAuthed);
+            break;
+        default:
+            res.status(204).end();
+            break;
+    }
 });
 
 // garbage we will not tolerate
