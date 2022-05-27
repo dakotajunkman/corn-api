@@ -27,6 +27,30 @@ async function getFarmAndCorn(farmId, cornId) {
     return res;
 }
 
+function validPatch(body) {
+    const valid = [];
+
+    Object.keys(body).forEach(att => {
+        if (!constants.farmPatch.has(att)) {
+            valid.push(false);
+        } else {
+            switch (att) {
+                case "name":
+                    valid.push(typeof(body.name) === "string" && body.name.length > 0 && body.name.length < 50);
+                    break;
+                case "size":
+                    valid.push(typeof(body.size) === "number" && body.size > 0);
+                    break;
+                case "state":
+                    valid.push(constants.states.has(body.state));
+                    break;
+            }
+        }
+    });
+
+    return valid.every(ele => ele === true);
+}
+
 async function updateFarmAndCorn(farm, farmId, corn, cornId) {
     const farmKey = ds.key([constants.FARM, parseInt(farmId, 10)]);
     const cornKey = ds.key([constants.CORN, parseInt(cornId, 10)]);
@@ -227,6 +251,31 @@ async function putFarm(req) {
     return body;
 }
 
+async function patchFarm(req) {
+    const body = req.body;
+    if (!validPatch(body)) {
+        return;
+    }
+
+    const farmId = req.params.farmId;
+    const key = ds.key([constants.FARM, parseInt(farmId, 10)]);
+    const farmObj = await ds.get(key);
+    if (!constants.itemExists(farmObj)) {
+        return false;
+    }
+
+    const farm = farmObj[0];
+    if (farm.owner !== req.auth.sub) {
+        return "NOAUTH";
+    }
+
+    Object.keys(body).forEach(att => farm[att] = body[att]);
+    await ds.update({key: key, data: farm});
+    farm.id = farmId;
+    farm.self = constants.generateSelfFromReq(req, farmId);
+    return farm;
+}
+
 module.exports = {
     createFarm,
     getFarmById,
@@ -234,5 +283,6 @@ module.exports = {
     assignCorn,
     removeCorn,
     deleteFarm,
-    putFarm
+    putFarm,
+    patchFarm
 }

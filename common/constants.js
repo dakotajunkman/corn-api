@@ -33,6 +33,8 @@ const states = new Set(["AL", "AK", "AZ", "AR", "AS", "CA", "CO", "CT", "DE", "D
 
 const cornTypes = new Set(["flint", "dent", "sweet", "pop"]);
 
+const farmPatch = new Set(["name", "size", "state"]);
+
 /* CONSTANT/SHARED FUNCTIONS */
 function acceptJson(req) {
     return req.accepts(JSON);
@@ -96,5 +98,6 @@ module.exports = {
     itemsNoExist,
     unAuthed,
     generateCornObjFromId,
-    generateFarmObjFromId
+    generateFarmObjFromId,
+    farmPatch
 }
