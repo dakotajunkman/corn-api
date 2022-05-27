@@ -57,6 +57,18 @@ router.get("/", async (req, res) => {
     res.status(200).json(allCorn);
 });
 
+// delete corn (Why though?)
+router.delete("/:cornId", async (req, res) => {
+    const success = await corn.deleteCorn(req);
+
+    if (!success) {
+        res.status(404).json(constants.doesntExit);
+        return;
+    }
+
+    res.status(204).end();
+});
+
 // nobody will be allowed to delete all the corn
 router.delete("/", (req, res) => {
     res.status(405).set("Accept", "POST, GET").end();

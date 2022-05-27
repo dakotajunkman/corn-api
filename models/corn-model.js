@@ -89,8 +89,36 @@ async function getAllCorn(req) {
     return retCorn;
 }
 
+async function deleteCorn(req) {
+    const cornId = req.params.cornId;
+    const key = ds.key([constants.CORN, parseInt(cornId, 10)]);
+    const cornObj = await ds.get(key);
+
+    if (!constants.itemExists(cornObj)) {
+        return false;
+    }
+
+    const corn = cornObj[0];
+    const promises = [];
+    if (corn.farm !== null) {
+        const farm = await getFarm(corn.farm);
+        farm.cornFields = farm.cornFields.filter(id => id !== cornId);
+        const key = ds.key([constants.FARM, parseInt(farm[ds.KEY].id, 10)]);
+        promises.push(ds.update({key: key, data: farm}));
+    }
+
+    promises.push(ds.delete(key));
+    return Promise.all(promises).then (() => true);
+}
+
+async function getFarm(farmId) {
+    return ds.get(ds.key([constants.FARM, parseInt(farmId, 10)]))
+        .then(farm => farm[0]);
+}
+
 module.exports = {
     createCorn,
     getCornById,
-    getAllCorn
+    getAllCorn,
+    deleteCorn
 }
