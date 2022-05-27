@@ -201,11 +201,38 @@ async function getCornFields(arr) {
     return resolved.map(corn => corn[0]);
 }
 
+async function putFarm(req) {
+    const farmId = req.params.farmId;
+    const key = ds.key([constants.FARM, parseInt(farmId, 10)]);
+    const farmObj = await ds.get(key);
+    if (!constants.itemExists(farmObj)) {
+        return;
+    }
+
+    const farm = farmObj[0];
+    if (farm.owner !== req.auth.sub) {
+        return false;
+    }
+
+    const body = req.body;
+    if (!validBody(body)) {
+        return "400";
+    }
+
+    body.owner = farm.owner;
+    body.cornFields = farm.cornFields;
+    await ds.update({key: key, data: body});
+    body.id = farmId;
+    body.self = constants.generateSelfFromReq(req, farmId);
+    return body;
+}
+
 module.exports = {
     createFarm,
     getFarmById,
     getFarmsForOwner,
     assignCorn,
     removeCorn,
-    deleteFarm
+    deleteFarm,
+    putFarm
 }

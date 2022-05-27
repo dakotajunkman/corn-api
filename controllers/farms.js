@@ -124,6 +124,35 @@ router.delete("/:farmId", checkJwt, async (req, res) => {
 
 });
 
+// update an entire farm
+router.put("/:farmId", checkJwt, async (req, res) => {
+    if (!constants.isJson(req)) {
+        res.status(415).json(constants.jsonAccErr);
+        return;
+    }
+
+    if (!constants.acceptJson(req)) {
+        res.status(406).json(constants.jsonResErr);
+        return;
+    }
+
+    const updated = await farms.putFarm(req);
+    switch (updated) {
+        case undefined:
+            res.status(404).json(constants.doesntExit);
+            break;
+        case false:
+            res.status(403).json(constants.unAuthed);
+            break;
+        case "400":
+            res.status(400).json(constants.bodyErr);
+            break;
+        default:
+            res.status(200).json(updated);
+            break;
+    }
+});
+
 // garbage we will not tolerate
 router.delete("/", (req, res) => {
     res.status(405).set("Accept", "POST, GET").end();
