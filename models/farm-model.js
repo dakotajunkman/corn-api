@@ -156,10 +156,56 @@ async function removeCorn(req) {
         .then(() => true);
 }
 
+async function deleteFarm(req) {
+    const farmId = req.params.farmId;
+    const key = ds.key([constants.FARM, parseInt(farmId, 10)]);
+    const farmObj = await ds.get(key);
+
+    if (!constants.itemExists(farmObj)) {
+        return;
+    }
+
+    const farm = farmObj[0];
+    if (farm.owner !== req.auth.sub) {
+        return false;
+    }
+
+    const promises = [];
+    if (farm.cornFields.length > 0) {
+        const fields = await getCornFields(farm.cornFields);
+        const noFarm = fields.map(corn => {
+            corn.farm = null;
+            return corn;
+        });
+
+        noFarm.forEach(corn => {
+            const id = corn[ds.KEY].id;
+            const key = ds.key([constants.CORN, parseInt(id, 10)]);
+            promises.push(ds.update({key: key, data: corn}));
+        });
+    }
+
+    promises.push(ds.delete(key));
+    return Promise.all(promises).then(() => true);
+}
+
+async function getCornFields(arr) {
+    const promises = [];
+    arr.forEach(cornId => {
+        const key = ds.key([constants.CORN, parseInt(cornId, 10)]);
+        promises.push(ds.get(key));
+    });
+
+    const resolved = await Promise.all(promises);
+
+    return resolved.map(corn => corn[0]);
+}
+
 module.exports = {
     createFarm,
     getFarmById,
     getFarmsForOwner,
     assignCorn,
-    removeCorn
+    removeCorn,
+    deleteFarm
 }

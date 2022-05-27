@@ -107,6 +107,23 @@ router.delete("/:farmId/cornfields/:cornId", checkJwt, async (req, res) => {
     }
 });
 
+// delete a farm
+router.delete("/:farmId", checkJwt, async (req, res) => {
+    const success = await farms.deleteFarm(req);
+    switch (success) {
+        case undefined:
+            res.status(404).json(constants.doesntExit);
+            break;
+        case false:
+            res.status(403).json(constants.unAuthed);
+            break;
+        default:
+            res.status(204).end();
+            break;
+    }
+
+});
+
 // garbage we will not tolerate
 router.delete("/", (req, res) => {
     res.status(405).set("Accept", "POST, GET").end();
