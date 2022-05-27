@@ -95,6 +95,32 @@ router.put("/:cornId", async (req, res) => {
     }
 });
 
+// update partial field
+router.patch("/:cornId", async (req, res) => {
+    if (!constants.isJson(req)) {
+        res.status(415).json(constants.jsonAccErr);
+        return;
+    }
+
+    if (!constants.acceptJson(req)) {
+        res.status(406).json(constants.jsonResErr);
+        return;
+    }
+
+    const updated = await corn.patchCorn(req);
+    switch (updated) {
+        case undefined:
+            res.status(400).json(constants.bodyErr);
+            break;
+        case false:
+            res.status(404).json(constants.doesntExit);
+            break;
+        default:
+            res.status(200).json(updated);
+            break;
+    }
+});
+
 // nobody will be allowed to delete all the corn
 router.delete("/", (req, res) => {
     res.status(405).set("Accept", "POST, GET").end();

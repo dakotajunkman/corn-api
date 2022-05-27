@@ -30,6 +30,30 @@ function validPut(body) {
     return validType && validSize && validKeys && validHeight;
 }
 
+function validPatch(body) {
+    const valid = [];
+    Object.keys(body).forEach(att => {
+        if (!constants.cornPatch.has(att)) {
+            valid.push(false);
+        } else {
+            switch (att) {
+                case "size":
+                    valid.push(typeof(body.size) === "number" && body.size > 0);
+                    break;
+                case "type":
+                    valid.push(constants.cornTypes.has(body.type));
+                    break;
+                case "kneeHighByFourthOfJuly":
+                    valid.push(typeof(body.kneeHighByFourthOfJuly) === "boolean" ||
+                    body.kneeHighByFourthOfJuly === null);
+                    break;
+            }
+        }
+    });
+
+    return valid.every(ele => ele === true);
+}
+
 async function createCorn(req) {
     const key = ds.key([constants.CORN]);
     const cornObj = req.body;
@@ -153,10 +177,32 @@ async function putCorn(req) {
     return body;
 }
 
+async function patchCorn(req) {
+    const body = req.body;
+    if (!validPatch(body)) {
+        return;
+    }
+
+    const cornId = req.params.cornId;
+    const key = ds.key([constants.CORN, parseInt(cornId, 10)]);
+    const cornObj = await ds.get(key);
+    if (!constants.itemExists(cornObj)) {
+        return false;
+    }
+
+    const corn = cornObj[0];
+    Object.keys(body).forEach(att => corn[att] = body[att]);
+    await ds.update({key: key, data: corn});
+    corn.id = cornId;
+    corn.self = constants.generateSelfFromReq(req, cornId);
+    return corn;
+}
+
 module.exports = {
     createCorn,
     getCornById,
     getAllCorn,
     deleteCorn,
-    putCorn
+    putCorn,
+    patchCorn
 }
