@@ -15,6 +15,21 @@ function isValidCorn(body) {
     return validType && validSize && validKeys;
 }
 
+function validPut(body) {
+    const keys = Object.keys(body);
+    const validKeys = keys.length === 3
+        && keys.includes("size") 
+        && keys.includes("type")
+        && keys.includes("kneeHighByFourthOfJuly");
+
+    const validSize = typeof(body.size) === "number" && body.size > 0;
+    const validType = constants.cornTypes.has(body.type);
+    const validHeight = typeof(body.kneeHighByFourthOfJuly) === "boolean" ||
+        body.kneeHighByFourthOfJuly === null; 
+
+    return validType && validSize && validKeys && validHeight;
+}
+
 async function createCorn(req) {
     const key = ds.key([constants.CORN]);
     const cornObj = req.body;
@@ -116,9 +131,32 @@ async function getFarm(farmId) {
         .then(farm => farm[0]);
 }
 
+async function putCorn(req) {
+    const cornId = req.params.cornId;
+    const key = ds.key([constants.CORN, parseInt(cornId, 10)]);
+    const cornObj = await ds.get(key);
+    if (!constants.itemExists(cornObj)) {
+        return;
+    }
+
+    const body = req.body;
+    if (!validPut(body)) {
+        return false;
+    }
+
+    const corn = cornObj[0];
+    
+    body.farm = corn.farm;
+    await ds.update({key: key, data: body});
+    body.id = cornId;
+    body.self = constants.generateSelfFromReq(req, cornId);
+    return body;
+}
+
 module.exports = {
     createCorn,
     getCornById,
     getAllCorn,
-    deleteCorn
+    deleteCorn,
+    putCorn
 }
